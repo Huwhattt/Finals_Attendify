@@ -130,7 +130,6 @@ public class Login extends AppCompatActivity {
     }
 
     //EMPLOYEE CHECK-------------------------
-
     private void handleEmployeeLogin(DocumentSnapshot doc, String inputPassword) {
 
         if (!doc.exists()) {
@@ -144,13 +143,17 @@ public class Login extends AppCompatActivity {
 
             toast("Login successful");
 
-            startActivity(new Intent(this, MainActivity_Employee.class));
+            // ✅ Pass employeeId to MainActivity_Employee
+            Intent intent = new Intent(this, MainActivity_Employee.class);
+            intent.putExtra("employeeId", doc.getId()); // Pass the Firestore document ID
+            startActivity(intent);
             finish();
 
         } else {
             toast("Incorrect password");
         }
     }
+
 
     //------------------------
     private void toast(String msg) {
