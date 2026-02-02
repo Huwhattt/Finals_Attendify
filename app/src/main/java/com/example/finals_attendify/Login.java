@@ -17,11 +17,16 @@ import androidx.core.view.WindowInsetsCompat;
 
 import com.example.finals_attendify.databinding.ActivityLoginBinding;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class Login extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
+
+
     private FirebaseAuth auth;
+    private FirebaseFirestore db;
 
     private RadioButton studentRB, teacherRB;
     private Drawable whitePill;
@@ -34,73 +39,36 @@ public class Login extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        auth = FirebaseAuth.getInstance();
+        auth = FirebaseAuth.getInstance();      // students
+        db = FirebaseFirestore.getInstance();  // employees
 
         studentRB = binding.studentRadioButton;
         teacherRB = binding.teacherRadioButton;
-        RadioGroup radioGroup = binding.userType;
 
         whitePill = ContextCompat.getDrawable(this, R.drawable.rbwhitebg);
 
-        updateSelection(radioGroup.getCheckedRadioButtonId());
-
-        radioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(RadioGroup group, int checkedId) {
-                if (checkedId != -1) {
-                    updateSelection(checkedId);
-
-                    // Also update the label
-                    if (checkedId == R.id.studentRadioButton) {
-                        binding.employeeNumberLabel.setText("Student Number");
-                    } else {
-                        binding.employeeNumberLabel.setText("Employee Number");
-                    }
-                }
-            }
-        });
+        setupRadioGroup();
+        setupLogin();
+        setupInsets();
 
         binding.backArrow.setOnClickListener(v -> finish());
+    }
 
-        binding.loginButton.setOnClickListener(v -> {
-            String userNumber = binding.employeeNumber.getText().toString().trim();
-            String password = binding.password.getText().toString().trim();
+    //--------------------------
+    private void setupRadioGroup() {
 
-            if (TextUtils.isEmpty(userNumber) || TextUtils.isEmpty(password)) {
-                Toast.makeText(Login.this, "All fields are required", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        RadioGroup group = binding.userType;
 
-            if (!binding.termsAndConditions.isChecked()) {
-                Toast.makeText(Login.this, "You must agree to the terms and conditions", Toast.LENGTH_SHORT).show();
-                return;
-            }
+        updateSelection(group.getCheckedRadioButtonId());
 
-            String email;
-            if (studentRB.isChecked()) {
-                email = userNumber + "@attendify.com";
+        group.setOnCheckedChangeListener((g, checkedId) -> {
+            updateSelection(checkedId);
+
+            if (checkedId == R.id.studentRadioButton) {
+                binding.employeeNumberLabel.setText("Student Number");
             } else {
-                email = userNumber + "@attendify.com";
+                binding.employeeNumberLabel.setText("Employee Number");
             }
-
-            auth.signInWithEmailAndPassword(email, password)
-                    .addOnSuccessListener(authResult -> {
-                        if (studentRB.isChecked()) {
-                            startActivity(new Intent(Login.this, MainActivity_Students.class));
-                        } else {
-                            startActivity(new Intent(Login.this, MainActivity_Employee.class));
-                        }
-                        finish();
-                    })
-                    .addOnFailureListener(e ->
-                            Toast.makeText(Login.this, "Login failed: " + e.getMessage(), Toast.LENGTH_SHORT).show()
-                    );
-        });
-
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
         });
     }
 
@@ -110,8 +78,93 @@ public class Login extends AppCompatActivity {
 
         if (checkedId == R.id.studentRadioButton) {
             studentRB.setBackground(whitePill);
-        } else if (checkedId == R.id.teacherRadioButton) {
+        } else {
             teacherRB.setBackground(whitePill);
         }
+    }
+
+    //---------------------------
+    private void setupLogin() {
+
+        binding.loginButton.setOnClickListener(v -> {
+
+            String userNumber = binding.employeeNumber.getText().toString().trim();
+            String password = binding.password.getText().toString().trim();
+
+            if (TextUtils.isEmpty(userNumber) || TextUtils.isEmpty(password)) {
+                toast("All fields are required");
+                return;
+            }
+
+            if (!binding.termsAndConditions.isChecked()) {
+                toast("You must agree to the terms");
+                return;
+            }
+
+            // STUDENT
+            if (studentRB.isChecked()) {
+
+                String email = userNumber + "@attendify.com";
+
+                auth.signInWithEmailAndPassword(email, password)
+                        .addOnSuccessListener(authResult -> {
+                            startActivity(new Intent(this, MainActivity_Students.class));
+                            finish();
+                        })
+                        .addOnFailureListener(e ->
+                                toast("Login failed: " + e.getMessage())
+                        );
+            }
+            // EMPLOYEE
+            else {
+
+                db.collection("employee") // collection
+                        .document(userNumber)
+                        .get()
+                        .addOnSuccessListener(documentSnapshot -> handleEmployeeLogin(documentSnapshot, password))
+                        .addOnFailureListener(e ->
+                                toast("Login failed: " + e.getMessage())
+                        );
+            }
+        });
+    }
+
+    //EMPLOYEE CHECK-------------------------
+    private void handleEmployeeLogin(DocumentSnapshot doc, String inputPassword) {
+
+        if (!doc.exists()) {
+            toast("Employee ID not found");
+            return;
+        }
+
+        String dbPassword = doc.getString("password");
+
+        if (dbPassword != null && dbPassword.equals(inputPassword)) {
+
+            toast("Login successful");
+
+            // ✅ Pass employeeId to MainActivity_Employee
+            Intent intent = new Intent(this, MainActivity_Employee.class);
+            intent.putExtra("employeeId", doc.getId()); // Pass the Firestore document ID
+            startActivity(intent);
+            finish();
+
+        } else {
+            toast("Incorrect password");
+        }
+    }
+
+
+    //------------------------
+    private void toast(String msg) {
+        Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
+    }
+
+    private void setupInsets() {
+        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
+            Insets bars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+            v.setPadding(bars.left, bars.top, bars.right, bars.bottom);
+            return insets;
+        });
     }
 }
