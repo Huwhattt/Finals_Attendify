@@ -1,5 +1,6 @@
 package com.example.finals_attendify;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.EditText;
@@ -19,7 +20,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-public class MainActivity_Employee extends AppCompatActivity {
+public class MainActivity_Employee extends AppCompatActivity implements EmployeeClassAdapter.OnItemClickListener {
 
     private FirebaseFirestore db;
     private TextView tvGreeting, tvNoClasses;
@@ -47,7 +48,7 @@ public class MainActivity_Employee extends AppCompatActivity {
         }
 
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new EmployeeClassAdapter(new ArrayList<>());
+        adapter = new EmployeeClassAdapter(new ArrayList<>(), this);
         recyclerView.setAdapter(adapter);
 
         loadEmployeeName();
@@ -160,5 +161,16 @@ public class MainActivity_Employee extends AppCompatActivity {
             code.append(chars.charAt(r.nextInt(chars.length())));
         }
         return code.toString();
+    }
+    @Override
+    public void onItemClick(EmployeeClass employeeClass) {
+        // Create intent to open the dashboard
+        Intent intent = new Intent(MainActivity_Employee.this, employee_class_dashboard.class);
+
+        // Pass data to the dashboard so it knows which class was clicked
+        intent.putExtra("subjectName", employeeClass.subjectName);
+        intent.putExtra("section", employeeClass.section);
+
+        startActivity(intent);
     }
 }

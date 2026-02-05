@@ -64,6 +64,10 @@ public class Login extends AppCompatActivity {
         group.setOnCheckedChangeListener((g, checkedId) -> {
             updateSelection(checkedId);
 
+            //deletes data if click other radio button
+            binding.employeeNumber.setText("");
+            binding.password.setText("");
+
             if (checkedId == R.id.studentRadioButton) {
                 binding.employeeNumberLabel.setText("Student Number");
             } else {

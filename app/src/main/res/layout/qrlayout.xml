@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.cardview.widget.CardView
+        android:layout_width="359dp"
+        android:layout_height="471dp"
+        android:background="#fcf9da"
+        android:backgroundTint="#fcf9da"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" >
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/textView3"
+                android:layout_width="191dp"
+                android:layout_height="42dp"
+                android:text="Create Attendance"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.11"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.062" />
+
+            <EditText
+                android:id="@+id/etDate"
+                android:layout_width="296dp"
+                android:layout_height="50dp"
+                android:layout_marginTop="28dp"
+                android:ems="10"
+                android:hint="Date :"
+                android:inputType="text"
+                android:focusable="false"
+                android:clickable="true"
+                android:textColor="#000000"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.493"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView3"
+                app:layout_constraintVertical_bias="0.006" />
+
+            <EditText
+                android:id="@+id/etStart"
+                android:layout_width="296dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="Start Time :"
+                android:inputType="text"
+                android:focusable="false"
+                android:clickable="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.492"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/etDate"
+                app:layout_constraintVertical_bias="0.069" />
+
+            <EditText
+                android:id="@+id/etLate"
+                android:layout_width="296dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="Late After :"
+                android:inputType="text"
+                android:focusable="false"
+                android:clickable="true"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.492"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/etStart"
+                app:layout_constraintVertical_bias="0.103" />
+
+            <EditText
+                android:id="@+id/etEnd"
+                android:layout_width="296dp"
+                android:layout_height="50dp"
+                android:ems="10"
+                android:hint="End Time :"
+                android:focusable="false"
+                android:clickable="true"
+                android:inputType="text"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.492"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/etLate"
+                app:layout_constraintVertical_bias="0.112" />
+
+            <Button
+                android:id="@+id/cancelBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#E57373"
+                android:fontFamily="@font/applegaramond"
+                android:text="Cancel"
+                android:textColor="#000000"
+                android:textColorLink="#000000"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.115"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/etEnd"
+                app:layout_constraintVertical_bias="0.557" />
+
+            <Button
+                android:id="@+id/createBtn"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:backgroundTint="#AED581"
+                android:fontFamily="@font/applegaramond"
+                android:text="Create"
+                android:textColor="#000000"
+                android:textColorLink="#000000"
+                android:textSize="16sp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.783"
+                app:layout_constraintStart_toEndOf="@+id/cancelBtn"
+                app:layout_constraintTop_toBottomOf="@+id/etEnd"
+                app:layout_constraintVertical_bias="0.557" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.cardview.widget.CardView>
+</androidx.constraintlayout.widget.ConstraintLayout>

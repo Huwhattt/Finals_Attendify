@@ -1,85 +1,90 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="@drawable/sdash">
 
     <!-- Greeting -->
     <TextView
         android:id="@+id/tvGreeting"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="28dp"
         android:text="Hello, Employee!"
         android:textSize="24sp"
         android:textStyle="bold"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="28dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <!-- Class Label -->
+
+    <!-- RecyclerView -->
+
+    <!-- "No classes yet" message -->
+
     <TextView
         android:id="@+id/classLabel"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="8dp"
         android:text="Class"
         android:textSize="20sp"
         android:textStyle="bold"
-        android:layout_marginStart="20dp"
-        android:layout_marginTop="28dp"
-        app:layout_constraintTop_toBottomOf="@id/tvGreeting"
-        app:layout_constraintStart_toStartOf="parent"/>
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvGreeting" />
 
-    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/srow"
         android:layout_width="0dp"
         android:layout_height="0dp"
         android:layout_marginStart="16dp"
-        android:layout_marginEnd="16dp"
         android:layout_marginTop="8dp"
+        android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
-        app:layout_constraintTop_toBottomOf="@id/classLabel"
         app:layout_constraintBottom_toTopOf="@id/splus"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintTop_toBottomOf="@id/classLabel"
+        app:layout_constraintVertical_bias="1.0" />
 
-    <!-- "No classes yet" message -->
     <TextView
         android:id="@+id/tvNoClasses"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="No classes yet"
-        android:textSize="18sp"
         android:textColor="#000000"
+        android:textSize="18sp"
         android:visibility="gone"
-        app:layout_constraintTop_toTopOf="@id/srow"
         app:layout_constraintBottom_toBottomOf="@id/srow"
+        app:layout_constraintEnd_toEndOf="@id/srow"
         app:layout_constraintStart_toStartOf="@id/srow"
-        app:layout_constraintEnd_toEndOf="@id/srow"/>
+        app:layout_constraintTop_toTopOf="@id/srow" />
 
     <!-- Plus button -->
     <ImageView
         android:id="@+id/splus"
         android:layout_width="60dp"
         android:layout_height="60dp"
-        android:src="@android:drawable/ic_input_add"
         android:layout_marginBottom="10dp"
+        android:src="@android:drawable/ic_input_add"
         app:layout_constraintBottom_toTopOf="@id/tvCreate"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Label under plus -->
     <TextView
         android:id="@+id/tvCreate"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginBottom="24dp"
         android:text="Create Class"
         android:textSize="16sp"
-        android:layout_marginBottom="24dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"/>
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
 </androidx.constraintlayout.widget.ConstraintLayout>

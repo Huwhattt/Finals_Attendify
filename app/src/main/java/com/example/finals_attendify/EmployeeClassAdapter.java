@@ -12,6 +12,18 @@ public class EmployeeClassAdapter extends RecyclerView.Adapter<EmployeeClassAdap
 
     private List<EmployeeClass> items;
 
+    public interface OnItemClickListener {
+        void onItemClick(EmployeeClass employeeClass);
+    }
+
+    // 2. Create a variable to hold the listener
+    private OnItemClickListener listener;
+
+    // 3. Update your constructor to accept the listener
+    public EmployeeClassAdapter(List<EmployeeClass> items, OnItemClickListener listener) {
+        this.items = items;
+        this.listener = listener;
+    }
     public EmployeeClassAdapter(List<EmployeeClass> items) {
         this.items = items;
     }
@@ -29,6 +41,15 @@ public class EmployeeClassAdapter extends RecyclerView.Adapter<EmployeeClassAdap
         EmployeeClass item = items.get(position);
         holder.tvSubjectName.setText(item.subjectName);
         holder.tvSection.setText(item.section);
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (listener != null) {
+                    listener.onItemClick(item);
+                }
+            }
+        });
     }
 
     @Override
