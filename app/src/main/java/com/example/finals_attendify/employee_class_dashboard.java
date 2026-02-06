@@ -22,22 +22,31 @@ import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.Locale;
+
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
 import com.google.zxing.WriterException;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import android.app.Dialog;
+import java.text.ParseException;
 
 public class employee_class_dashboard extends AppCompatActivity {
 
-    TextView day, date, tvGreet, classLbl, sectionLbl;
+    TextView day, date, tvGreet, classLbl, sectionLbl, status;
     ImageView ivQr;
     Button createBtn, cancelBtn, backBtn, qrBtn;
     private Bitmap generatedQrBitmap = null; // Stores the generated QR
-    private String endTimeValue = "";
+
     private String endTimeStr = "";
     private final Calendar calendar = Calendar.getInstance();
+    private long classExpiryTime = 0;
+    private long expiryTimestamp = 0;
+    private String subjectName;
+    private String qrData = "";
 
+    private final android.os.Handler statusHandler = new android.os.Handler();
+    private Runnable statusRunnable;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,6 +59,7 @@ public class employee_class_dashboard extends AppCompatActivity {
             return insets;
         });
 
+        status = findViewById(R.id.status);
         sectionLbl = findViewById(R.id.sectionLbl);
         classLbl = findViewById(R.id.classLbl);
         date = findViewById(R.id.date);
@@ -85,70 +95,188 @@ public class employee_class_dashboard extends AppCompatActivity {
             sectionLbl.setText(section);
         }
 
+        expiryTimestamp = getIntent().getLongExtra("expiryTimestamp", 0);
+        String qrData = getIntent().getStringExtra("qrData");
+
+        // INITIAL CHECK: Set status when opening the activity
+        if (qrData != null && System.currentTimeMillis() < expiryTimestamp) {
+            status.setText("Attendance is ACTIVE");
+            status.setTextColor(android.graphics.Color.GREEN);
+        } else {
+            status.setText("Attendance is INACTIVE");
+            status.setTextColor(android.graphics.Color.RED);
+        }
+
         //Display day and date
         day.setText(dayString);
         date.setText(dateString);
 
         qrBtn.setOnClickListener(v -> handleqr());
+
+        classExpiryTime = getIntent().getLongExtra("expiryTimestamp", 0);
+        String existingQr = getIntent().getStringExtra("qrData");
+
+
+        startStatusUpdateLoop();
     }
 
-    private void handleqr() {
-        // Check if QR exists and if the current time is before etEnd
+    private void startStatusUpdateLoop() {
+        statusRunnable = new Runnable() {
+            @Override
+            public void run() {
+                if (expiryTimestamp != 0) {
+                    if (System.currentTimeMillis() < expiryTimestamp) {
+                        status.setText("Attendance is ACTIVE");
+                        status.setTextColor(android.graphics.Color.GREEN);
+                        // Check again in 1 second
+                        statusHandler.postDelayed(this, 1000);
+                    } else {
+                        status.setText("Attendance is INACTIVE");
+                        status.setTextColor(android.graphics.Color.RED);
+                        generatedQrBitmap = null; // Clear the expired QR
+                    }
+                }
+            }
+        };
+        statusHandler.post(statusRunnable);
+    }
 
-        if (generatedQrBitmap != null && !isTimeExpired(endTimeStr)) {
-            showQrCodeLayout(); // Show the QR display screen
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        // Stop the loop when activity is destroyed to prevent memory leaks
+        if (statusHandler != null && statusRunnable != null) {
+            statusHandler.removeCallbacks(statusRunnable);
+        }
+    }
+    private void handleqr() {
+        long currentTime = System.currentTimeMillis();
+
+        // Condition: Bitmap must exist AND current time must be less than expiry
+        if (generatedQrBitmap != null && currentTime < expiryTimestamp) {
+            // Show the generated QR
+            showQrCodeLayout();
         } else {
-            showInputPopup(); // Show the popup to create a new one
+            // Either first time or QR expired, show input popup
+            showInputPopup();
         }
     }
 
     private void showInputPopup() {
-        // Create the dialog
         final Dialog dialog = new Dialog(this);
         dialog.setContentView(R.layout.qrlayout);
 
-        // Make the dialog background transparent so the CardView corners look rounded
         if (dialog.getWindow() != null) {
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
         }
 
-        // Initialize views inside the popup
         EditText etDate = dialog.findViewById(R.id.etDate);
         EditText etStart = dialog.findViewById(R.id.etStart);
         EditText etLate = dialog.findViewById(R.id.etLate);
         EditText etEnd = dialog.findViewById(R.id.etEnd);
         Button createBtn = dialog.findViewById(R.id.createBtn);
-        Button cancelBtn = dialog.findViewById(R.id.cancelBtn);
+        Button cancelBtnInDialog = dialog.findViewById(R.id.cancelBtn);
 
-        // Set up Pickers
+        // Pickers
         etDate.setOnClickListener(v -> showDatePicker(etDate));
         etStart.setOnClickListener(v -> showTimePicker(etStart));
         etLate.setOnClickListener(v -> showTimePicker(etLate));
         etEnd.setOnClickListener(v -> showTimePicker(etEnd));
 
-        // Cancel Button dismisses the popup
-        cancelBtn.setOnClickListener(v -> dialog.dismiss());
 
-        // Create Button generates QR and moves to the next screen
+        cancelBtnInDialog.setOnClickListener(v -> {
+            dialog.dismiss();
+        });
+
+
         createBtn.setOnClickListener(v -> {
-            String date = etDate.getText().toString();
-            String start = etStart.getText().toString();
-            endTimeStr = etEnd.getText().toString();
+            String dateInput = etDate.getText().toString().trim();
+            String startInput = etStart.getText().toString().trim();
+            String lateInput = etLate.getText().toString().trim();
+            String currentEndStr = etEnd.getText().toString().trim(); // Use a local variable name
 
-            if (date.isEmpty() || start.isEmpty() || endTimeStr.isEmpty()) {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+            if (dateInput.isEmpty() || startInput.isEmpty() || lateInput.isEmpty() || currentEndStr.isEmpty()) {
+                Toast.makeText(this, "Invalid Input", Toast.LENGTH_SHORT).show();
                 return;
             }
 
-            // Generate the QR
-            generatedQrBitmap = generateQRCode("Date: " + date + " | Start: " + start);
+            try {
+                SimpleDateFormat sdfDate = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+                SimpleDateFormat sdfTime = new SimpleDateFormat("hh:mm a", Locale.getDefault());
 
-            dialog.dismiss(); // Close the popup
-            showQrCodeLayout(); // Show the layout_show_qr screen
+                Date selectedDate = sdfDate.parse(dateInput); // .parse needs java.util.Date
+
+                // Normalize Today for comparison
+                Calendar calToday = Calendar.getInstance();
+                calToday.set(Calendar.HOUR_OF_DAY, 0);
+                calToday.set(Calendar.MINUTE, 0);
+                calToday.set(Calendar.SECOND, 0);
+                calToday.set(Calendar.MILLISECOND, 0);
+                Date todayDate = calToday.getTime();
+
+                // --- VALIDATIONS ---
+                if (selectedDate.before(todayDate)) {
+                    Toast.makeText(this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                if (selectedDate.equals(todayDate)) {
+                    Date startTime = sdfTime.parse(startInput);
+                    Calendar now = Calendar.getInstance();
+                    Calendar startCal = Calendar.getInstance();
+                    startCal.setTime(startTime);
+                    startCal.set(now.get(Calendar.YEAR), now.get(Calendar.MONTH), now.get(Calendar.DAY_OF_MONTH));
+
+                    if (startCal.before(now)) {
+                        Toast.makeText(this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+                }
+
+                if (startInput.equals(lateInput) || startInput.equals(currentEndStr) || lateInput.equals(currentEndStr)) {
+                    Toast.makeText(this, "Invalid Input", Toast.LENGTH_SHORT).show();
+                    return;
+                }
+
+                // --- SUCCESS ---
+                Calendar endCal = Calendar.getInstance();
+                endCal.setTime(selectedDate);
+                Date endTimeDate = sdfTime.parse(currentEndStr); // This is where .parse is used
+                Calendar timeParts = Calendar.getInstance();
+                timeParts.setTime(endTimeDate);
+
+                endCal.set(Calendar.HOUR_OF_DAY, timeParts.get(Calendar.HOUR_OF_DAY));
+                endCal.set(Calendar.MINUTE, timeParts.get(Calendar.MINUTE));
+
+                // Update Global Variables (Class scope)
+                expiryTimestamp = endCal.getTimeInMillis();
+                qrData = "Subject: " + (classLbl != null ? classLbl.getText().toString() : "Class") + " | End: " + currentEndStr;
+                generatedQrBitmap = generateQRCode(qrData);
+
+                statusHandler.removeCallbacks(statusRunnable);
+                startStatusUpdateLoop();
+
+                dialog.dismiss();
+                showQrCodeLayout();
+
+            } catch (ParseException e) {
+                // This handles the "Red Parse" error if the date format is wrong
+                Toast.makeText(this, "Invalid Input", Toast.LENGTH_SHORT).show();
+            }
         });
-
         dialog.show();
     }
+
+    @Override
+    public void onBackPressed() {
+        Intent resultIntent = new Intent();
+        resultIntent.putExtra("updatedExpiry", expiryTimestamp);
+        resultIntent.putExtra("updatedQr", qrData);
+        resultIntent.putExtra("subjectName", subjectName); // To identify which item changed
+        setResult(RESULT_OK, resultIntent);
+        finish();
+    }
+
 
     private void showQrCodeLayout() {
         // 1. Create the Dialog instance
@@ -271,11 +399,10 @@ public class employee_class_dashboard extends AppCompatActivity {
         new TimePickerDialog(this, (view, hourOfDay, minute) -> {
             calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
             calendar.set(Calendar.MINUTE, minute);
-
-            // "hh:mm a" produces "01:30 PM"
-            SimpleDateFormat sdf12 = new SimpleDateFormat("hh:mm a", Locale.getDefault());
-            field.setText(sdf12.format(calendar.getTime()));
-        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show(); // false = 12hr format
+            // "hh:mm a" is required for the validation logic to work
+            SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
+            field.setText(sdf.format(calendar.getTime()));
+        }, calendar.get(Calendar.HOUR_OF_DAY), calendar.get(Calendar.MINUTE), false).show();
     }
 
     private Bitmap generateQRCode(String text) {
@@ -293,7 +420,7 @@ public class employee_class_dashboard extends AppCompatActivity {
     private boolean isTimeExpired(String endTime) {
         if (endTime.isEmpty()) return true;
         try {
-            // Change "HH:mm" to "hh:mm a" to match your picker
+
             SimpleDateFormat sdf = new SimpleDateFormat("hh:mm a", Locale.getDefault());
             String currentTime = sdf.format(Calendar.getInstance().getTime());
             return sdf.parse(currentTime).after(sdf.parse(endTime));

@@ -23,8 +23,6 @@ import com.google.firebase.firestore.FirebaseFirestore;
 public class Login extends AppCompatActivity {
 
     private ActivityLoginBinding binding;
-
-
     private FirebaseAuth auth;
     private FirebaseFirestore db;
 
@@ -67,6 +65,7 @@ public class Login extends AppCompatActivity {
             //deletes data if click other radio button
             binding.employeeNumber.setText("");
             binding.password.setText("");
+
 
             if (checkedId == R.id.studentRadioButton) {
                 binding.employeeNumberLabel.setText("Student Number");

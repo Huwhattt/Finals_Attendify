@@ -164,12 +164,13 @@ public class MainActivity_Employee extends AppCompatActivity implements Employee
     }
     @Override
     public void onItemClick(EmployeeClass employeeClass) {
-        // Create intent to open the dashboard
         Intent intent = new Intent(MainActivity_Employee.this, employee_class_dashboard.class);
-
-        // Pass data to the dashboard so it knows which class was clicked
         intent.putExtra("subjectName", employeeClass.subjectName);
         intent.putExtra("section", employeeClass.section);
+
+        // Pass these for persistence
+        intent.putExtra("qrData", employeeClass.qrData);
+        intent.putExtra("expiryTimestamp", employeeClass.expiryTimestamp);
 
         startActivity(intent);
     }

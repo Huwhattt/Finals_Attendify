@@ -5,7 +5,8 @@ public class EmployeeClass {
     public String subjectName;
     public String section;
     public String createdBy;
-
+    public String qrData;        // Store generated QR string
+    public long expiryTimestamp; // Store end time in milliseconds
     // Empty constructor needed for Firestore
     public EmployeeClass() { }
 
@@ -20,5 +21,11 @@ public class EmployeeClass {
     public EmployeeClass(String subjectName, String section) {
         this.subjectName = subjectName;
         this.section = section;
+    }
+
+    //Constructor for fetching data
+    public EmployeeClass(String qrData, long expiryTimestamp){
+        this.qrData = qrData;
+        this.expiryTimestamp = expiryTimestamp;
     }
 }
