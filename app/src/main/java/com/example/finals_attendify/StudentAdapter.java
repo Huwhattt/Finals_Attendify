@@ -1,8 +1,11 @@
 package com.example.finals_attendify;
 
+import android.app.Dialog;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
@@ -33,7 +36,43 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
             @NonNull ViewHolder holder, int position) {
 
         String subjectName = items.get(position);
-        holder.tvSubjectName.setText(subjectName);  // bind the subject name
+        holder.tvSubjectName.setText(subjectName);
+
+        holder.itemView.setOnClickListener(v -> {
+
+            Dialog dialog = new Dialog(v.getContext());
+            View view = LayoutInflater.from(v.getContext())
+                    .inflate(R.layout.attendclass, null);
+
+            dialog.setContentView(view);
+
+
+            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+            dialog.show();
+
+            dialog.getWindow().setLayout(
+                    ViewGroup.LayoutParams.WRAP_CONTENT,
+                    ViewGroup.LayoutParams.WRAP_CONTENT
+            );
+
+
+            Button btnSubmit = view.findViewById(R.id.btnSubmitAttend);
+            Button btnCancel = view.findViewById(R.id.btnCancelAttend);
+
+            btnSubmit.setOnClickListener(ok -> {
+                dialog.dismiss();
+
+                Intent intent = new Intent(v.getContext(), scanner_part.class);
+                intent.putExtra("className", subjectName);
+                v.getContext().startActivity(intent);
+            });
+
+            btnCancel.setOnClickListener(later -> {
+                dialog.dismiss();
+            });
+        });
+
     }
 
     @Override
@@ -50,7 +89,6 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
         }
     }
 
-    // Fixed updateData method
     public void updateData(List<String> newItems) {
         this.items.clear();
         this.items.addAll(newItems);
