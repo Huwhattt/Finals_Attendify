@@ -24,6 +24,8 @@ public class scanner_part extends AppCompatActivity {
     private DecoratedBarcodeView barcodeView;
     private static final int CAMERA_PERMISSION_REQUEST = 101;
 
+    private String scannedText;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -31,17 +33,20 @@ public class scanner_part extends AppCompatActivity {
 
         barcodeView = findViewById(R.id.barcodeScanner);
 
-        // Check Camera Permission
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.CAMERA}, CAMERA_PERMISSION_REQUEST);
+            ActivityCompat.requestPermissions(
+                    this,
+                    new String[]{Manifest.permission.CAMERA},
+                    CAMERA_PERMISSION_REQUEST
+            );
         } else {
             barcodeView.decodeContinuous(callback);
         }
+
     }
 
-    // Handle Permission Result
+    // camera permission
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -59,35 +64,20 @@ public class scanner_part extends AppCompatActivity {
         }
     }
 
-    private final BarcodeCallback callback = new BarcodeCallback() {
-        @Override
-        public void barcodeResult(BarcodeResult result) {
+    private final BarcodeCallback callback = result -> {
 
-            if (result.getText() != null) {
+        if (result.getText() == null) return;
 
-                barcodeView.pause(); // stop scanning after success
+        barcodeView.pause();
 
+        String sessionId = result.getText();
 
-                String teacherEndTime = "09:00"; // later from Firebase
+        Intent intent = new Intent(scanner_part.this, MainActivity_Students.class);
+        intent.putExtra("SESSION_ID", sessionId);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
 
-                SimpleDateFormat sdf = new SimpleDateFormat("HH:mm", Locale.getDefault());
-                String currentTime = sdf.format(new Date());
-
-                try {
-                    Date end = sdf.parse(teacherEndTime);
-                    Date now = sdf.parse(currentTime);
-
-                    if (now.before(end)) {
-                        showStatus("You are ON TIME!");
-                    } else {
-                        showStatus("You are LATE!");
-                    }
-
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
-        }
+        startActivity(intent);
+        finish();
     };
 
     private void showStatus(String message) {
@@ -95,7 +85,10 @@ public class scanner_part extends AppCompatActivity {
                 .setTitle("Attendance Status")
                 .setMessage(message)
                 .setPositiveButton("OK", (d, i) -> {
-                    startActivity(new Intent(scanner_part.this, MainActivity_Students.class));
+
+                    Intent intent = new Intent(scanner_part.this, MainActivity_Students.class);
+                    intent.putExtra("SESSION_ID", scannedText);
+                    startActivity(intent);
                     finish();
                 })
                 .show();
@@ -112,4 +105,6 @@ public class scanner_part extends AppCompatActivity {
         super.onPause();
         if (barcodeView != null) barcodeView.pause();
     }
+
+
 }

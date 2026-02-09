@@ -21,8 +21,10 @@ import androidx.core.view.WindowInsetsCompat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Locale;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.BarcodeFormat;
 import com.google.zxing.MultiFormatWriter;
@@ -30,6 +32,7 @@ import com.google.zxing.WriterException;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 import android.app.Dialog;
 import java.text.ParseException;
+import java.util.Map;
 
 public class employee_class_dashboard extends AppCompatActivity {
 
@@ -44,7 +47,9 @@ public class employee_class_dashboard extends AppCompatActivity {
     private long expiryTimestamp = 0;
     private String subjectName;
     private String qrData = "";
-
+    private FirebaseFirestore db;
+    private String sessionId;
+    private Dialog qrDialog;
     private final android.os.Handler statusHandler = new android.os.Handler();
     private Runnable statusRunnable;
 
@@ -62,17 +67,15 @@ public class employee_class_dashboard extends AppCompatActivity {
         status = findViewById(R.id.status);
         sectionLbl = findViewById(R.id.sectionLbl);
         classLbl = findViewById(R.id.classLbl);
-        date = findViewById(R.id.date);
         tvGreet = findViewById(R.id.tvGreet);
+        date = findViewById(R.id.date);
         day = findViewById(R.id.day);
         ivQr = findViewById(R.id.iv_qr);
         createBtn = findViewById(R.id.createBtn);
         cancelBtn = findViewById(R.id.cancelBtn);
         backBtn = findViewById(R.id.backBtn);
         qrBtn = findViewById(R.id.qrBtn);
-
-
-
+        db = FirebaseFirestore.getInstance();
 
 
         // initialize date
@@ -88,11 +91,16 @@ public class employee_class_dashboard extends AppCompatActivity {
         // get data from the Intent
         String subject = getIntent().getStringExtra("subjectName");
         String section = getIntent().getStringExtra("section");
+        String greetText = getIntent().getStringExtra("tvGreet");
 
         //display data
         if (subject != null && section != null) {
             classLbl.setText(subject);
             sectionLbl.setText(section);
+        }
+
+        if (greetText != null && !greetText.isEmpty()) {
+            tvGreet.setText(greetText);
         }
 
         expiryTimestamp = getIntent().getLongExtra("expiryTimestamp", 0);
@@ -116,6 +124,17 @@ public class employee_class_dashboard extends AppCompatActivity {
         classExpiryTime = getIntent().getLongExtra("expiryTimestamp", 0);
         String existingQr = getIntent().getStringExtra("qrData");
 
+        db.collection("attendance_records")
+                .whereEqualTo("sessionId", sessionId)
+                .whereEqualTo("status", "PRESENT");
+
+        db.collection("attendance_records")
+                .whereEqualTo("sessionId", sessionId)
+                .whereEqualTo("status", "LATE");
+
+        db.collection("attendance_records")
+                .whereEqualTo("sessionId", sessionId)
+                .whereEqualTo("status", "ABSENT");
 
         startStatusUpdateLoop();
     }
@@ -250,8 +269,51 @@ public class employee_class_dashboard extends AppCompatActivity {
 
                 // Update Global Variables (Class scope)
                 expiryTimestamp = endCal.getTimeInMillis();
-                qrData = "Subject: " + (classLbl != null ? classLbl.getText().toString() : "Class") + " | End: " + currentEndStr;
-                generatedQrBitmap = generateQRCode(qrData);
+
+                // for sessionId format: classCode_date_time
+                String subjectCode = classLbl.getText().toString();
+
+                SimpleDateFormat sdfDateId = new SimpleDateFormat("yyyyMMdd", Locale.getDefault());
+                SimpleDateFormat sdfTimeId = new SimpleDateFormat("HHmm", Locale.getDefault());
+
+                String idDate = sdfDateId.format(new Date());
+                String idTime = sdfTimeId.format(new Date());
+
+                sessionId = subjectCode + "_" + idDate + "_" + idTime;
+                db.collection("employee")
+                        .document("20260113")
+                        .get()
+                        .addOnSuccessListener(empDoc -> {
+
+                            if (!empDoc.exists()) {
+                                Toast.makeText(this, "Employee not found", Toast.LENGTH_SHORT).show();
+                                return;
+                            }
+
+                            String employeeName = empDoc.getString("name");
+
+                            Map<String, Object> session = new HashMap<>();
+                            session.put("subjectId", classLbl.getText().toString());
+                            session.put("startTime", startInput);
+                            session.put("lateTime", lateInput);
+                            session.put("endTime", currentEndStr);
+                            session.put("status", "ACTIVE");
+                            session.put("createdBy", employeeName);
+
+                            db.collection("attendance_sessions")
+                                    .document(sessionId)
+                                    .set(session)
+                                    .addOnSuccessListener(unused -> {
+                                        qrData = sessionId;
+                                        generatedQrBitmap = generateQRCode(sessionId);
+                                        startStatusUpdateLoop();
+                                        dialog.dismiss();
+                                        showQrCodeLayout();
+                                    })
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(this, "Failed to create session", Toast.LENGTH_SHORT).show()
+                                    );
+                        });
 
                 statusHandler.removeCallbacks(statusRunnable);
                 startStatusUpdateLoop();
@@ -276,7 +338,6 @@ public class employee_class_dashboard extends AppCompatActivity {
         setResult(RESULT_OK, resultIntent);
         finish();
     }
-
 
     private void showQrCodeLayout() {
         // 1. Create the Dialog instance

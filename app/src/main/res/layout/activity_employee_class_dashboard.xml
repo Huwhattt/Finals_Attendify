@@ -13,21 +13,23 @@
         android:layout_width="248dp"
         android:layout_height="36dp"
         android:layout_marginStart="32dp"
-        android:layout_marginTop="24dp"
-        android:text="Hello, Employee"
+        android:layout_marginTop="44dp"
+        android:fontFamily="@font/applegaramond"
         android:textColor="#000000"
-        android:textSize="24sp"
+        android:textSize="30dp"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/date"/>
 
     <TextView
         android:id="@+id/day"
-        android:layout_width="101dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="91dp"
+        android:layout_height="28dp"
+        android:layout_marginTop="44dp"
+        android:fontFamily="@font/applegaramond"
         android:textAlignment="center"
         android:textColor="#050505"
-        android:textSize="16sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.158"
         app:layout_constraintStart_toStartOf="parent"
@@ -36,14 +38,15 @@
 
     <TextView
         android:id="@+id/date"
-        android:layout_width="144dp"
-        android:layout_height="30dp"
-        android:layout_marginTop="24dp"
+        android:layout_width="214dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="44dp"
+        android:fontFamily="@font/applegaramond"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="16sp"
+        android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.478"
+        app:layout_constraintHorizontal_bias="0.352"
         app:layout_constraintStart_toEndOf="@+id/day"
         app:layout_constraintTop_toBottomOf="@+id/tvGreet"
         tools:text="January 30, 2026" />
@@ -54,33 +57,34 @@
         android:layout_height="320dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.516"
+        app:layout_constraintHorizontal_bias="0.515"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3"
-        app:layout_constraintVertical_bias="0.129"
+        app:layout_constraintVertical_bias="0.225"
         app:srcCompat="@drawable/emp_dash_wbg" />
 
     <TextView
         android:id="@+id/status"
         android:layout_width="231dp"
         android:layout_height="33dp"
+        android:fontFamily="@font/applegaramond"
         android:text="Attendance is INACTIVE"
         android:textAlignment="center"
         android:textColor="#000000"
-        android:textSize="20sp"
+        android:textSize="24sp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.503"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.062" />
+        app:layout_constraintVertical_bias="0.104" />
 
     <Button
         android:id="@+id/qrBtn"
         android:layout_width="85dp"
         android:layout_height="77dp"
         android:background="@drawable/baseline_qr_code_scanner_24"
-        android:backgroundTint="@color/black"
+        android:backgroundTint="@color/white"
+        android:backgroundTintMode="add"
         android:shadowColor="@color/black"
         android:textColor="@color/black"
         android:textColorHighlight="@color/black"
@@ -98,7 +102,7 @@
         android:id="@+id/imageView3"
         android:layout_width="320dp"
         android:layout_height="66dp"
-        android:layout_marginTop="12dp"
+        android:layout_marginTop="24dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.494"
         app:layout_constraintStart_toStartOf="parent"
@@ -110,6 +114,7 @@
         android:layout_width="179dp"
         android:layout_height="25dp"
         android:layout_marginTop="12dp"
+        android:fontFamily="@font/applegaramond"
         android:text="Class"
         android:textAlignment="textStart"
         android:textColor="#020202"
@@ -123,6 +128,7 @@
         android:id="@+id/sectionLbl"
         android:layout_width="179dp"
         android:layout_height="18dp"
+        android:fontFamily="@font/applegaramond"
         android:text="Section"
         android:textAlignment="textStart"
         android:textColor="#181717"
@@ -133,5 +139,48 @@
         app:layout_constraintStart_toStartOf="@+id/imageView3"
         app:layout_constraintTop_toBottomOf="@+id/classLbl"
         app:layout_constraintVertical_bias="0.0" />
+
+    <ImageView
+        android:id="@+id/imageView6"
+        android:layout_width="116dp"
+        android:layout_height="113dp"
+        app:layout_constraintBottom_toTopOf="@id/imageView9"
+        app:layout_constraintEnd_toStartOf="@id/imageView7"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="@id/imageView4"
+        app:layout_constraintTop_toBottomOf="@+id/status"
+        app:layout_constraintVertical_bias="0.968"
+        app:srcCompat="@drawable/students" />
+
+    <ImageView
+        android:id="@+id/imageView7"
+        android:layout_width="133dp"
+        android:layout_height="118dp"
+        app:layout_constraintBottom_toTopOf="@id/imageView10"
+        app:layout_constraintEnd_toEndOf="@id/imageView4"
+        app:layout_constraintStart_toEndOf="@id/imageView6"
+        app:layout_constraintTop_toBottomOf="@+id/status"
+        app:layout_constraintVertical_bias="0.958"
+        app:srcCompat="@drawable/present" />
+
+    <ImageView
+        android:id="@+id/imageView9"
+        android:layout_width="132dp"
+        android:layout_height="117dp"
+        app:layout_constraintBottom_toBottomOf="@id/imageView4"
+        app:layout_constraintEnd_toStartOf="@id/imageView10"
+        app:layout_constraintStart_toStartOf="@id/imageView4"
+        app:layout_constraintTop_toBottomOf="@id/imageView6"
+        app:srcCompat="@drawable/absent" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="123dp"
+        android:layout_height="114dp"
+        app:layout_constraintBottom_toBottomOf="@id/imageView4"
+        app:layout_constraintEnd_toEndOf="@id/imageView4"
+        app:layout_constraintStart_toEndOf="@id/imageView9"
+        app:layout_constraintTop_toBottomOf="@id/imageView7"
+        app:srcCompat="@drawable/late" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

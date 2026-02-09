@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -37,7 +38,7 @@ public class Login extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        auth = FirebaseAuth.getInstance();      // students
+        auth = FirebaseAuth.getInstance();     // students
         db = FirebaseFirestore.getInstance();  // employees
 
         studentRB = binding.studentRadioButton;
@@ -131,7 +132,6 @@ public class Login extends AppCompatActivity {
             }
         });
     }
-
     //EMPLOYEE CHECK-------------------------
     private void handleEmployeeLogin(DocumentSnapshot doc, String inputPassword) {
 

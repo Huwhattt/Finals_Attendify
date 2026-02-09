@@ -14,12 +14,18 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 
 public class MainActivity_Students extends AppCompatActivity {
@@ -27,7 +33,7 @@ public class MainActivity_Students extends AppCompatActivity {
     TextView txt1;
     private FirebaseAuth auth;
     private FirebaseFirestore db;
-
+    private  String scannedQrText;
     private RecyclerView recyclerView;
     private StudentAdapter adapter;
 
@@ -69,8 +75,97 @@ public class MainActivity_Students extends AppCompatActivity {
                 });
 
         splus.setOnClickListener(v -> showJoinClassDialog());
+
+        String sessionId = getIntent().getStringExtra("SESSION_ID");
+        if (sessionId != null) {
+            markAttendance(sessionId);
+        }
+
     }
 
+    // method to add sa firebase
+    private void markAttendance(String sessionId) {
+
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        db.collection("student_register")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(studentDoc -> {
+
+                    if (!studentDoc.exists()) {
+                        Toast.makeText(this, "Student record not found", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    String studentNumber = studentDoc.getString("studentNumber");
+
+                    db.collection("attendance_sessions")
+                            .document(sessionId)
+                            .get()
+                            .addOnSuccessListener(sessionDoc -> {
+
+                                if (!sessionDoc.exists()) {
+                                    Toast.makeText(this, "Invalid or expired QR", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                String lateStr = sessionDoc.getString("lateTime");
+                                String endStr  = sessionDoc.getString("endTime");
+
+                                if (lateStr == null || endStr == null) {
+                                    Toast.makeText(this, "Session time data invalid", Toast.LENGTH_SHORT).show();
+                                    return;
+                                }
+
+                                try {
+                                    SimpleDateFormat sdf =
+                                            new SimpleDateFormat("hh:mm a", Locale.getDefault());
+
+                                    Date now = sdf.parse(sdf.format(new Date()));
+                                    Date lateTime = sdf.parse(lateStr);
+                                    Date endTime  = sdf.parse(endStr);
+
+                                    String status;
+                                    if (now.before(lateTime) || now.equals(lateTime)) {
+                                        status = "PRESENT";
+                                    } else if (now.before(endTime) || now.equals(endTime)) {
+                                        status = "LATE";
+                                    } else {
+                                        status = "ABSENT";
+                                    }
+
+                                    SimpleDateFormat sa = new SimpleDateFormat("yyyy-MM-dd hh:mm", Locale.getDefault());
+                                    String scannedAt = sa.format(new Date());
+
+                                    Map<String, Object> record = new HashMap<>();
+                                    record.put("sessionId", sessionId);
+                                    record.put("studentNumber", studentNumber);
+                                    record.put("status", status);
+                                    record.put("scannedAt", scannedAt);
+
+                                    db.collection("attendance_records")
+                                            .add(record)
+                                            .addOnSuccessListener(doc -> {
+
+                                                new AlertDialog.Builder(this)
+                                                        .setTitle("Attendance Recorded")
+                                                        .setMessage("Status: " + status)
+                                                        .setCancelable(false)
+                                                        .setPositiveButton("OK",
+                                                                (d, w) -> d.dismiss())
+                                                        .show();
+                                            });
+
+                                } catch (ParseException e) {
+                                    e.printStackTrace();
+                                    Toast.makeText(this,
+                                            "Time parsing error",
+                                            Toast.LENGTH_SHORT).show();
+                                }
+                            });
+                });
+    }
     private void showJoinClassDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         View view = getLayoutInflater().inflate(R.layout.joinclass, null);
@@ -125,7 +220,6 @@ public class MainActivity_Students extends AppCompatActivity {
                     Toast.makeText(this, "Failed to join class: " + e.getMessage(), Toast.LENGTH_SHORT).show();
                 });
     }
-
     private void loadJoinedClasses() {
         String uid = auth.getCurrentUser().getUid();
 
@@ -159,8 +253,6 @@ public class MainActivity_Students extends AppCompatActivity {
                     }
                 });
     }
-
-
     private String extractSurname(String fullName) {
         if (fullName == null || fullName.isEmpty()) return "";
         String[] parts = fullName.trim().split(" ");

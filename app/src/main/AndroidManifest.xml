@@ -29,9 +29,6 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".employee_login"
-            android:exported="false" />
-        <activity
             android:name=".MainActivity_Employee"
             android:exported="false" />
         <activity
