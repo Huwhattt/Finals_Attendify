@@ -119,6 +119,11 @@ public class employee_class_dashboard extends AppCompatActivity {
         if (section != null) sectionLbl.setText(section);
         if (greetText != null) greetTxt.setText(greetText);
 
+        if (sessionId != null && !sessionId.isEmpty()) {
+            generatedQrBitmap = generateQRCode(sessionId);
+            ivQr.setImageBitmap(generatedQrBitmap);
+        }
+
 
         updateStatusText();
     }
@@ -142,34 +147,16 @@ public class employee_class_dashboard extends AppCompatActivity {
 
 
     private void handleQrButton() {
-        if (generatedQrBitmap != null && System.currentTimeMillis() < expiryTimestamp) {
-            showQrDialog();
-        } else {
+        // If the session is expired or doesn't exist, show the input dialog
+        if (generatedQrBitmap == null || System.currentTimeMillis() >= expiryTimestamp) {
             showQrInputDialog();
+        } else {
+            Toast.makeText(this, "Session is already active", Toast.LENGTH_SHORT).show();
         }
     }
 
 
-    private void showQrDialog() {
-        Dialog qrDialog = new Dialog(this);
-        qrDialog.setContentView(R.layout.qrcodeshow);
-        if (qrDialog.getWindow() != null) {
-            qrDialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
 
-
-        ImageView qrImage = qrDialog.findViewById(R.id.iv_qr);
-        Button backBtn = qrDialog.findViewById(R.id.backBtn);
-
-
-        if (generatedQrBitmap != null) qrImage.setImageBitmap(generatedQrBitmap);
-
-
-        backBtn.setOnClickListener(v -> qrDialog.dismiss());
-
-
-        qrDialog.show();
-    }
 
 
     private void showQrInputDialog() {
@@ -265,9 +252,13 @@ public class employee_class_dashboard extends AppCompatActivity {
                         .set(session)
                         .addOnSuccessListener(unused -> {
                             generatedQrBitmap = generateQRCode(sessionId);
+
+                            // Set the image directly to the dashboard ImageView
+                            ivQr.setImageBitmap(generatedQrBitmap);
+
                             updateStatusText();
                             dialog.dismiss();
-                            showQrDialog();
+                            Toast.makeText(this, "Session Started!", Toast.LENGTH_SHORT).show();
                         })
                         .addOnFailureListener(e -> Toast.makeText(this, "Failed to create session", Toast.LENGTH_SHORT).show());
 
