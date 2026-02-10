@@ -8,6 +8,7 @@
     android:background="@drawable/atttendance"
     tools:context=".employee_class_dashboard">
 
+
     <TextView
         android:id="@+id/tvGreet"
         android:layout_width="248dp"
@@ -20,6 +21,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintTop_toBottomOf="@id/date"/>
+
 
     <TextView
         android:id="@+id/day"
@@ -36,6 +38,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvGreet"
         tools:text="Friday" />
 
+
     <TextView
         android:id="@+id/date"
         android:layout_width="214dp"
@@ -51,6 +54,7 @@
         app:layout_constraintTop_toBottomOf="@+id/tvGreet"
         tools:text="January 30, 2026" />
 
+
     <ImageView
         android:id="@+id/imageView4"
         android:layout_width="316dp"
@@ -62,6 +66,7 @@
         app:layout_constraintTop_toBottomOf="@+id/imageView3"
         app:layout_constraintVertical_bias="0.225"
         app:srcCompat="@drawable/emp_dash_wbg" />
+
 
     <TextView
         android:id="@+id/status"
@@ -77,6 +82,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="@+id/imageView4"
         app:layout_constraintVertical_bias="0.104" />
+
 
     <Button
         android:id="@+id/qrBtn"
@@ -98,6 +104,7 @@
         app:rippleColor="@color/black"
         app:strokeColor="@color/black" />
 
+
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="320dp"
@@ -108,6 +115,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/day"
         app:srcCompat="@drawable/classdas" />
+
 
     <TextView
         android:id="@+id/classLbl"
@@ -123,6 +131,7 @@
         app:layout_constraintHorizontal_bias="0.393"
         app:layout_constraintStart_toStartOf="@+id/imageView3"
         app:layout_constraintTop_toTopOf="@+id/imageView3" />
+
 
     <TextView
         android:id="@+id/sectionLbl"
@@ -140,8 +149,9 @@
         app:layout_constraintTop_toBottomOf="@+id/classLbl"
         app:layout_constraintVertical_bias="0.0" />
 
+
     <ImageView
-        android:id="@+id/imageView6"
+        android:id="@+id/studentbutton"
         android:layout_width="116dp"
         android:layout_height="113dp"
         app:layout_constraintBottom_toTopOf="@id/imageView9"
@@ -152,16 +162,18 @@
         app:layout_constraintVertical_bias="0.968"
         app:srcCompat="@drawable/students" />
 
+
     <ImageView
         android:id="@+id/imageView7"
         android:layout_width="133dp"
         android:layout_height="118dp"
         app:layout_constraintBottom_toTopOf="@id/imageView10"
         app:layout_constraintEnd_toEndOf="@id/imageView4"
-        app:layout_constraintStart_toEndOf="@id/imageView6"
+        app:layout_constraintStart_toEndOf="@id/studentbutton"
         app:layout_constraintTop_toBottomOf="@+id/status"
         app:layout_constraintVertical_bias="0.958"
         app:srcCompat="@drawable/present" />
+
 
     <ImageView
         android:id="@+id/imageView9"
@@ -170,8 +182,9 @@
         app:layout_constraintBottom_toBottomOf="@id/imageView4"
         app:layout_constraintEnd_toStartOf="@id/imageView10"
         app:layout_constraintStart_toStartOf="@id/imageView4"
-        app:layout_constraintTop_toBottomOf="@id/imageView6"
+        app:layout_constraintTop_toBottomOf="@id/studentbutton"
         app:srcCompat="@drawable/absent" />
+
 
     <ImageView
         android:id="@+id/imageView10"
@@ -182,5 +195,6 @@
         app:layout_constraintStart_toEndOf="@id/imageView9"
         app:layout_constraintTop_toBottomOf="@id/imageView7"
         app:srcCompat="@drawable/late" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
