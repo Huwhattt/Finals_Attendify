@@ -124,16 +124,16 @@
 
     <ImageView
         android:id="@+id/studentbutton"
-        android:layout_width="97dp"
-        android:layout_height="92dp"
+        android:layout_width="84dp"
+        android:layout_height="81dp"
         android:layout_marginTop="36dp"
         android:layout_marginEnd="68dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/qrBtn"
-        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.351"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/imageView4"
-        app:layout_constraintVertical_bias="0.0"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.928"
         app:srcCompat="@drawable/students" />
 
     <ImageView
@@ -167,6 +167,7 @@
         android:id="@+id/iv_qr"
         android:layout_width="181dp"
         android:layout_height="180dp"
+        android:background="@drawable/bgemp"
         app:layout_constraintBottom_toBottomOf="@+id/imageView4"
         app:layout_constraintEnd_toEndOf="@+id/imageView4"
         app:layout_constraintStart_toStartOf="@+id/imageView4"
