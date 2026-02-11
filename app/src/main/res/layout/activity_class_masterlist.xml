@@ -26,14 +26,42 @@
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMaster"
-        android:layout_width="401dp"
-        android:layout_height="629dp"
+        android:layout_width="347dp"
+        android:layout_height="500dp"
         android:padding="8dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@id/tvMasterlistTitle"
+        app:layout_constraintVertical_bias="0.197"
         tools:listitem="@layout/item_masterlist" />
+
+    <Button
+        android:id="@+id/suspend"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#FF0000"
+        android:text="Suspend"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.863"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerMaster"
+        app:layout_constraintVertical_bias="0.558" />
+
+    <Button
+        android:id="@+id/reactivate"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="20dp"
+        android:backgroundTint="#48E61B"
+        android:text="Reactivate"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toStartOf="@+id/suspend"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/recyclerMaster"
+        app:layout_constraintVertical_bias="0.558" />
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
