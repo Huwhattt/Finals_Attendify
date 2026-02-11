@@ -14,7 +14,9 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class ClassMasterlistActivity extends AppCompatActivity {
 
@@ -23,7 +25,7 @@ public class ClassMasterlistActivity extends AppCompatActivity {
     private List<StudentStatus> studentList;
     private FirebaseFirestore db;
     private Button btnSuspend, btnReactivate;
-    private StudentStatus selectedStudent; // This will hold the student you click on
+    private StudentStatus selectedStudent;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -36,9 +38,6 @@ public class ClassMasterlistActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
 
         studentList = new ArrayList<>();
-
-        // IMPORTANT: In your MasterlistAdapter, you should implement an OnItemClickListener
-        // so that when a row is clicked, it sets the 'selectedStudent' variable.
         adapter = new MasterlistAdapter(studentList);
         recyclerView.setAdapter(adapter);
 
@@ -52,14 +51,15 @@ public class ClassMasterlistActivity extends AppCompatActivity {
 
         fetchAttendanceRecords(sessionId);
 
-        // --- SUSPEND BUTTON LOGIC ---
         btnSuspend.setOnClickListener(v -> {
+            selectedStudent = adapter.getSelectedStudent();
             if (selectedStudent != null) {
                 new AlertDialog.Builder(this)
                         .setTitle("Confirm Suspension")
-                        .setMessage("This item will be temporarily disabled and cannot be used until reactivated.")
+                        .setMessage("Student " + selectedStudent.studentNumber + " will be blocked and marked as SUSPENDED.")
                         .setPositiveButton("Suspend", (dialog, which) -> {
-                            updateStudentStatus(selectedStudent, true);
+                            // Pass true for suspendState and the new status string
+                            updateStudentStatus(selectedStudent, true, "SUSPENDED");
                         })
                         .setNegativeButton("Cancel", null)
                         .show();
@@ -68,14 +68,15 @@ public class ClassMasterlistActivity extends AppCompatActivity {
             }
         });
 
-        // --- REACTIVATE BUTTON LOGIC ---
         btnReactivate.setOnClickListener(v -> {
+            selectedStudent = adapter.getSelectedStudent();
             if (selectedStudent != null) {
                 new AlertDialog.Builder(this)
                         .setTitle("Reactivate")
-                        .setMessage("This will make the item active and usable again.")
+                        .setMessage("Allow student " + selectedStudent.studentNumber + " to log in again?")
                         .setPositiveButton("Reactivate", (dialog, which) -> {
-                            updateStudentStatus(selectedStudent, false);
+                            // Pass false for suspendState and reset status to ACTIVE (or PRESENT/LATE if you prefer)
+                            updateStudentStatus(selectedStudent, false, "ACTIVE");
                         })
                         .setNegativeButton("Cancel", null)
                         .show();
@@ -107,18 +108,31 @@ public class ClassMasterlistActivity extends AppCompatActivity {
                 });
     }
 
-    // THIS IS THE METHOD THAT WAS MISSING (The part that was red)
-    private void updateStudentStatus(StudentStatus student, boolean suspendState) {
-        // We find the document by studentNumber and update the 'suspended' field
+    // UPDATED METHOD: Now accepts a status string to update the UI text
+    private void updateStudentStatus(StudentStatus student, boolean suspendState, String newStatusText) {
+
+        // Prepare multiple fields to update
+        Map<String, Object> updates = new HashMap<>();
+        updates.put("suspended", suspendState);
+        updates.put("status", newStatusText);
+
         db.collection("attendance_records")
                 .whereEqualTo("studentNumber", student.studentNumber)
                 .get()
                 .addOnSuccessListener(querySnapshot -> {
+                    if (querySnapshot.isEmpty()) {
+                        Toast.makeText(this, "Student record not found in DB", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
                     for (QueryDocumentSnapshot doc : querySnapshot) {
-                        doc.getReference().update("suspended", suspendState)
+                        doc.getReference().update(updates)
                                 .addOnSuccessListener(aVoid -> {
-                                    student.suspended = suspendState; // Update local object
-                                    adapter.notifyDataSetChanged(); // Refresh list view
+                                    // Update the local object so the RecyclerView changes immediately
+                                    student.suspended = suspendState;
+                                    student.status = newStatusText;
+
+                                    adapter.notifyDataSetChanged();
+
                                     String message = suspendState ? "Student Suspended" : "Student Reactivated";
                                     Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
                                 });

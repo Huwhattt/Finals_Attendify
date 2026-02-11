@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.text.TextUtils;
-import android.util.Log;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
@@ -38,8 +37,8 @@ public class Login extends AppCompatActivity {
         binding = ActivityLoginBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
-        auth = FirebaseAuth.getInstance();     // students
-        db = FirebaseFirestore.getInstance();  // employees
+        auth = FirebaseAuth.getInstance();
+        db = FirebaseFirestore.getInstance();
 
         studentRB = binding.studentRadioButton;
         teacherRB = binding.teacherRadioButton;
@@ -53,20 +52,14 @@ public class Login extends AppCompatActivity {
         binding.backArrow.setOnClickListener(v -> finish());
     }
 
-    //--------------------------
     private void setupRadioGroup() {
-
         RadioGroup group = binding.userType;
-
         updateSelection(group.getCheckedRadioButtonId());
 
         group.setOnCheckedChangeListener((g, checkedId) -> {
             updateSelection(checkedId);
-
-            //deletes data if click other radio button
             binding.employeeNumber.setText("");
             binding.password.setText("");
-
 
             if (checkedId == R.id.studentRadioButton) {
                 binding.employeeNumberLabel.setText("Student Number");
@@ -87,11 +80,8 @@ public class Login extends AppCompatActivity {
         }
     }
 
-    //---------------------------
     private void setupLogin() {
-
         binding.loginButton.setOnClickListener(v -> {
-
             String userNumber = binding.employeeNumber.getText().toString().trim();
             String password = binding.password.getText().toString().trim();
 
@@ -105,36 +95,59 @@ public class Login extends AppCompatActivity {
                 return;
             }
 
-            // STUDENT
+            // --- STUDENT LOGIN LOGIC ---
             if (studentRB.isChecked()) {
-
                 String email = userNumber + "@attendify.com";
 
                 auth.signInWithEmailAndPassword(email, password)
                         .addOnSuccessListener(authResult -> {
-                            startActivity(new Intent(this, MainActivity_Students.class));
-                            finish();
-                        })
-                        .addOnFailureListener(e ->
-                                toast("Login failed: " + e.getMessage())
-                        );
-            }
-            // EMPLOYEE
-            else {
 
-                db.collection("employee") // collection
+                            // Fetch records for this student
+                            db.collection("attendance_records")
+                                    .whereEqualTo("studentNumber", userNumber)
+                                    .get()
+                                    .addOnSuccessListener(querySnapshot -> {
+                                        boolean isActuallySuspended = false;
+
+                                        // We loop through records. If we find even ONE that says suspended is true, we block.
+                                        // If no records exist, or all records have suspended = false/null, they can log in.
+                                        for (DocumentSnapshot doc : querySnapshot) {
+                                            Boolean status = doc.getBoolean("suspended");
+                                            if (status != null && status == true) {
+                                                isActuallySuspended = true;
+                                                break; // Found a suspension record, stop looking
+                                            }
+                                        }
+
+                                        if (isActuallySuspended) {
+                                            toast("you are suspended");
+                                            auth.signOut();
+                                        } else {
+                                            // Proceed if not suspended or if no record exists yet
+                                            startActivity(new Intent(this, MainActivity_Students.class));
+                                            finish();
+                                        }
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        // If the DB check fails, we let them in to avoid locking users out due to connection errors
+                                        startActivity(new Intent(this, MainActivity_Students.class));
+                                        finish();
+                                    });
+                        })
+                        .addOnFailureListener(e -> toast("Login failed: " + e.getMessage()));
+            }
+            // --- EMPLOYEE LOGIN LOGIC ---
+            else {
+                db.collection("employee")
                         .document(userNumber)
                         .get()
                         .addOnSuccessListener(documentSnapshot -> handleEmployeeLogin(documentSnapshot, password))
-                        .addOnFailureListener(e ->
-                                toast("Login failed: " + e.getMessage())
-                        );
+                        .addOnFailureListener(e -> toast("Login failed: " + e.getMessage()));
             }
         });
     }
-    //EMPLOYEE CHECK-------------------------
-    private void handleEmployeeLogin(DocumentSnapshot doc, String inputPassword) {
 
+    private void handleEmployeeLogin(DocumentSnapshot doc, String inputPassword) {
         if (!doc.exists()) {
             toast("Employee ID not found");
             return;
@@ -143,22 +156,16 @@ public class Login extends AppCompatActivity {
         String dbPassword = doc.getString("password");
 
         if (dbPassword != null && dbPassword.equals(inputPassword)) {
-
             toast("Login successful");
-
-            // ✅ Pass employeeId to MainActivity_Employee
             Intent intent = new Intent(this, MainActivity_Employee.class);
-            intent.putExtra("employeeId", doc.getId()); // Pass the Firestore document ID
+            intent.putExtra("employeeId", doc.getId());
             startActivity(intent);
             finish();
-
         } else {
             toast("Incorrect password");
         }
     }
 
-
-    //------------------------
     private void toast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }

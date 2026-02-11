@@ -114,7 +114,7 @@ public class employee_class_dashboard extends AppCompatActivity {
         expiryTimestamp = getIntent().getLongExtra("expiryTimestamp", 0);
         sessionId = getIntent().getStringExtra("qrData");
 
-        // if statements
+
         if (subject != null) classLbl.setText(subject);
         if (section != null) sectionLbl.setText(section);
         if (greetText != null) greetTxt.setText(greetText);

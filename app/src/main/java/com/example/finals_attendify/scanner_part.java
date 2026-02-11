@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
@@ -12,23 +11,27 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.google.firebase.firestore.FirebaseFirestore;
 import com.journeyapps.barcodescanner.BarcodeCallback;
+import com.journeyapps.barcodescanner.BarcodeResult;
 import com.journeyapps.barcodescanner.DecoratedBarcodeView;
+
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 public class scanner_part extends AppCompatActivity {
 
     private DecoratedBarcodeView barcodeView;
     private static final int CAMERA_PERMISSION_REQUEST = 101;
-    private FirebaseFirestore db; // Add Firestore instance
+
+    private String scannedText;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_class_masterlist); // NOTE: Ensure this layout matches your activity
+        setContentView(R.layout.activity_scanner_part);
 
         barcodeView = findViewById(R.id.barcodeScanner);
-        db = FirebaseFirestore.getInstance(); // Initialize Firestore
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.CAMERA)
                 != PackageManager.PERMISSION_GRANTED) {
@@ -40,8 +43,10 @@ public class scanner_part extends AppCompatActivity {
         } else {
             barcodeView.decodeContinuous(callback);
         }
+
     }
 
+    // camera permission
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions,
                                            @NonNull int[] grantResults) {
@@ -60,48 +65,33 @@ public class scanner_part extends AppCompatActivity {
     }
 
     private final BarcodeCallback callback = result -> {
+
         if (result.getText() == null) return;
 
         barcodeView.pause();
-        String scannedText = result.getText(); // This should be the student ID
 
-        // --- NEW LOGIC: CHECK IF STUDENT IS SUSPENDED ---
-        db.collection("attendance_records")
-                .document(scannedText) // Assuming document ID is the student number
-                .get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Boolean isSuspended = documentSnapshot.getBoolean("suspended");
+        String sessionId = result.getText();
 
-                        if (isSuspended != null && isSuspended) {
-                            // Student is suspended, block access
-                            new AlertDialog.Builder(this)
-                                    .setTitle("Access Denied")
-                                    .setMessage("This student is suspended and cannot scan.")
-                                    .setPositiveButton("OK", (d, i) -> barcodeView.resume()) // Resume scanning
-                                    .show();
-                        } else {
-                            // Student is active, proceed
-                            proceedToMain(scannedText);
-                        }
-                    } else {
-                        // Document doesn't exist, handle accordingly (maybe student isn't registered)
-                        Toast.makeText(this, "Student not found in records.", Toast.LENGTH_SHORT).show();
-                        barcodeView.resume();
-                    }
-                })
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this, "Error checking status: " + e.getMessage(), Toast.LENGTH_SHORT).show();
-                    barcodeView.resume();
-                });
-    };
-
-    private void proceedToMain(String sessionId) {
         Intent intent = new Intent(scanner_part.this, MainActivity_Students.class);
         intent.putExtra("SESSION_ID", sessionId);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
+
         startActivity(intent);
         finish();
+    };
+
+    private void showStatus(String message) {
+        new AlertDialog.Builder(this)
+                .setTitle("Attendance Status")
+                .setMessage(message)
+                .setPositiveButton("OK", (d, i) -> {
+
+                    Intent intent = new Intent(scanner_part.this, MainActivity_Students.class);
+                    intent.putExtra("SESSION_ID", scannedText);
+                    startActivity(intent);
+                    finish();
+                })
+                .show();
     }
 
     @Override
@@ -115,4 +105,6 @@ public class scanner_part extends AppCompatActivity {
         super.onPause();
         if (barcodeView != null) barcodeView.pause();
     }
+
+
 }
