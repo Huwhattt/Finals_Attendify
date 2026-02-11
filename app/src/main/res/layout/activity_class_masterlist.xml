@@ -1,68 +1,81 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#FFFFFF"
-    android:backgroundTint="#FDFDF7"
+    android:background="#FDFDF7"
     tools:context=".ClassMasterlistActivity">
 
-
+    <!-- Title -->
     <TextView
         android:id="@+id/tvMasterlistTitle"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:gravity="center"
         android:padding="16dp"
+        android:gravity="center"
         android:text="Class Masterlist"
-        android:textColor="#000000"
+        android:textColor="#121212"
         android:textSize="24sp"
         android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
+        android:fontFamily="@font/applegaramond"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-
+    <!-- RecyclerView -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/recyclerMaster"
-        android:layout_width="347dp"
-        android:layout_height="500dp"
-        android:padding="8dp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:padding="12dp"
+        tools:listitem="@layout/item_masterlist"
         app:layout_constraintTop_toBottomOf="@id/tvMasterlistTitle"
-        app:layout_constraintVertical_bias="0.197"
-        tools:listitem="@layout/item_masterlist" />
-
-    <Button
-        android:id="@+id/suspend"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:backgroundTint="#FF0000"
-        android:text="Suspend"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.863"
+        app:layout_constraintBottom_toTopOf="@id/buttonRow"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerMaster"
-        app:layout_constraintVertical_bias="0.558" />
+        app:layout_constraintEnd_toEndOf="parent" />
 
-    <Button
-        android:id="@+id/reactivate"
-        android:layout_width="wrap_content"
+    <!-- Button Row -->
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/buttonRow"
+        android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="20dp"
-        android:backgroundTint="#48E61B"
-        android:text="Reactivate"
+        android:layout_margin="16dp"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/suspend"
-        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/recyclerMaster"
-        app:layout_constraintVertical_bias="0.558" />
+        app:layout_constraintEnd_toEndOf="parent">
 
+        <!-- Reactivate -->
+        <Button
+            android:id="@+id/reactivate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#AED581"
+            android:text="Reactivate"
+            android:textColor="#000000"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/applegaramond"
+            app:cornerRadius="8dp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <!-- Suspend -->
+        <Button
+            android:id="@+id/suspend"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:backgroundTint="#E57373"
+            android:text="Suspend"
+            android:textColor="#121212"
+            android:textSize="16sp"
+            android:textStyle="bold"
+            android:fontFamily="@font/applegaramond"
+            app:cornerRadius="8dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

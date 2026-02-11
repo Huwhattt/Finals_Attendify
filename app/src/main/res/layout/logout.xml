@@ -12,82 +12,72 @@
         android:layout_margin="16dp"
         app:cardBackgroundColor="#FFF7E6"
         app:cardCornerRadius="20dp"
-        app:cardElevation="5dp"
+        app:cardElevation="6dp"
+        app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent">
+        app:layout_constraintEnd_toEndOf="parent">
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="20dp">
 
             <TextView
-                android:id="@+id/tvJoinTitle"
+                android:id="@+id/tvLogoutTitle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:text="Logout"
+                android:textSize="22sp"
+                android:textStyle="bold"
                 android:fontFamily="@font/applegaramond"
-                android:text="Join Class"
                 android:textColor="#121212"
-                android:textSize="24sp"
-                android:textStyle="bold"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintStart_toStartOf="parent" />
 
-            <EditText
-                android:id="@+id/etClassCode"
-                android:layout_width="0dp"
-                android:layout_height="58dp"
-                android:layout_marginTop="16dp"
-                android:background="@drawable/edit_text_background"
-                android:fontFamily="@font/applegaramond"
-                android:hint="Enter Class Code"
-                android:inputType="text"
-                android:padding="12dp"
-                android:textColor="#000000"
-                android:textStyle="bold"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/tvJoinTitle" />
-
-            <androidx.constraintlayout.widget.ConstraintLayout
-                android:id="@+id/buttonRow"
+            <TextView
+                android:id="@+id/tvLogoutMsg"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:gravity="end"
-                android:orientation="horizontal"
-                app:layout_constraintEnd_toEndOf="parent"
+                android:text="Are you sure you want to logout?"
+                android:textSize="16sp"
+                android:fontFamily="@font/applegaramond"
+                android:textColor="#121212"
+                android:layout_marginTop="12dp"
+                app:layout_constraintTop_toBottomOf="@id/tvLogoutTitle"
                 app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toBottomOf="@id/etClassCode">
+                app:layout_constraintEnd_toEndOf="parent" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                app:layout_constraintTop_toBottomOf="@id/tvLogoutMsg"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintEnd_toEndOf="parent">
 
                 <Button
-                    android:id="@+id/btnCancel"
+                    android:id="@+id/btnNo"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginEnd="112dp"
+                    android:text="No"
                     android:backgroundTint="#E57373"
-                    android:fontFamily="@font/applegaramond"
-                    android:text="Cancel"
                     android:textColor="#121212"
-                    android:textSize="16sp"
                     android:textStyle="bold"
+                    android:fontFamily="@font/applegaramond"
                     app:cornerRadius="8dp"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <Button
-                    android:id="@+id/btnJoin"
+                    android:id="@+id/btnYes"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
+                    android:text="Yes"
                     android:backgroundTint="#AED581"
-                    android:fontFamily="@font/applegaramond"
-                    android:text="Join"
-                    android:textColor="#000000"
-                    android:textSize="16sp"
+                    android:textColor="#121212"
                     android:textStyle="bold"
+                    android:fontFamily="@font/applegaramond"
                     app:cornerRadius="8dp"
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />

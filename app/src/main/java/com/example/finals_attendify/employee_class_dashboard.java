@@ -6,7 +6,10 @@ import android.app.TimePickerDialog;
 import android.app.Dialog;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,6 +18,7 @@ import android.widget.Toast;
 
 
 import androidx.activity.EdgeToEdge;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -72,7 +76,6 @@ public class employee_class_dashboard extends AppCompatActivity {
             return insets;
         });
 
-
         initViews();
         setupInitialData();
         setupButtons();
@@ -80,7 +83,6 @@ public class employee_class_dashboard extends AppCompatActivity {
 
         startStatusUpdateLoop();
     }
-
 
     private void initViews() {
         dayTxt = findViewById(R.id.day);
@@ -160,11 +162,16 @@ public class employee_class_dashboard extends AppCompatActivity {
 
 
     private void showQrInputDialog() {
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.qrlayout);
-        if (dialog.getWindow() != null) {
-            dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
-        }
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        View view = getLayoutInflater().inflate(R.layout.qrlayout, null);
+        builder.setView(view);
+
+        AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(
+                new ColorDrawable(Color.TRANSPARENT)
+        );
+        dialog.show();
+
 
 
         EditText etDate = dialog.findViewById(R.id.etDate);

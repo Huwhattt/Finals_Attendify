@@ -25,35 +25,33 @@
 
     <TextView
         android:id="@+id/day"
-        android:layout_width="91dp"
-        android:layout_height="28dp"
-        android:layout_marginTop="44dp"
+        android:layout_width="97dp"
+        android:layout_height="26dp"
+        android:layout_marginTop="48dp"
         android:fontFamily="@font/applegaramond"
         android:textAlignment="center"
         android:textColor="#050505"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.158"
+        app:layout_constraintHorizontal_bias="0.162"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/tvGreet"
         tools:text="Friday" />
 
-
     <TextView
         android:id="@+id/date"
-        android:layout_width="214dp"
-        android:layout_height="26dp"
-        android:layout_marginTop="44dp"
+        android:layout_width="168dp"
+        android:layout_height="25dp"
+        android:layout_marginTop="48dp"
         android:fontFamily="@font/applegaramond"
         android:textAlignment="center"
         android:textColor="#000000"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.352"
+        app:layout_constraintHorizontal_bias="0.722"
         app:layout_constraintStart_toEndOf="@+id/day"
         app:layout_constraintTop_toBottomOf="@+id/tvGreet"
         tools:text="January 30, 2026" />
-
 
     <Button
         android:id="@+id/qrBtn"
@@ -77,17 +75,17 @@
         app:rippleColor="@color/black"
         app:strokeColor="@color/black" />
 
+
     <ImageView
         android:id="@+id/imageView3"
         android:layout_width="320dp"
         android:layout_height="66dp"
-        android:layout_marginTop="24dp"
+        android:layout_marginTop="44dp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.494"
+        app:layout_constraintHorizontal_bias="0.571"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/day"
         app:srcCompat="@drawable/classdas" />
-
 
     <TextView
         android:id="@+id/classLbl"
@@ -138,14 +136,14 @@
 
     <ImageView
         android:id="@+id/imageView4"
-        android:layout_width="309dp"
-        android:layout_height="279dp"
+        android:layout_width="317dp"
+        android:layout_height="307dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.549"
+        app:layout_constraintHorizontal_bias="0.553"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView3"
-        app:layout_constraintVertical_bias="0.21"
+        app:layout_constraintVertical_bias="0.168"
         app:srcCompat="@drawable/bgemp" />
 
     <TextView

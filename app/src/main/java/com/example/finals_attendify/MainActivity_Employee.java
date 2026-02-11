@@ -1,13 +1,17 @@
 package com.example.finals_attendify;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -55,6 +59,47 @@ public class MainActivity_Employee extends AppCompatActivity implements Employee
         loadCreatedClasses();
 
         plusBtn.setOnClickListener(v -> showCreateClassDialog());
+
+        Button btnLogout = findViewById(R.id.btnLogout);
+
+        btnLogout.setOnClickListener(v -> {
+
+            View view = getLayoutInflater().inflate(R.layout.logout, null);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity_Employee.this);
+            builder.setView(view);
+
+            AlertDialog dialog = builder.create();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(
+                        new ColorDrawable(Color.TRANSPARENT)
+                );
+            }
+
+            Button btnYes = view.findViewById(R.id.btnYes);
+            Button btnNo = view.findViewById(R.id.btnNo);
+
+            btnYes.setOnClickListener(v1 -> {
+                Intent intent = new Intent(MainActivity_Employee.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
+
+            btnNo.setOnClickListener(v2 -> dialog.dismiss());
+
+            dialog.show();
+        });
+
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+
+                    }
+                });
+
     }
 
 
@@ -84,6 +129,9 @@ public class MainActivity_Employee extends AppCompatActivity implements Employee
         EditText etCustomCode = view.findViewById(R.id.etCustomCode);
 
         AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(
+                new ColorDrawable(Color.TRANSPARENT)
+        );
         dialog.show();
 
         view.findViewById(R.id.btnCreate).setOnClickListener(v -> {

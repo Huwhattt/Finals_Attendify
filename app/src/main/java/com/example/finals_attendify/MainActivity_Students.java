@@ -1,5 +1,8 @@
 package com.example.finals_attendify;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -8,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
@@ -81,6 +85,46 @@ public class MainActivity_Students extends AppCompatActivity {
             markAttendance(sessionId);
         }
 
+        Button btnLogout = findViewById(R.id.btnLogout);
+
+        btnLogout.setOnClickListener(v -> {
+
+            View view = getLayoutInflater().inflate(R.layout.logout, null);
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(MainActivity_Students.this);
+            builder.setView(view);
+
+            AlertDialog dialog = builder.create();
+
+            if (dialog.getWindow() != null) {
+                dialog.getWindow().setBackgroundDrawable(
+                        new ColorDrawable(Color.TRANSPARENT)
+                );
+            }
+
+            Button btnYes = view.findViewById(R.id.btnYes);
+            Button btnNo = view.findViewById(R.id.btnNo);
+
+            btnYes.setOnClickListener(v1 -> {
+                Intent intent = new Intent(MainActivity_Students.this, MainActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                startActivity(intent);
+                finish();
+            });
+
+            btnNo.setOnClickListener(v2 -> dialog.dismiss());
+
+            dialog.show();
+        });
+
+        getOnBackPressedDispatcher().addCallback(this,
+                new OnBackPressedCallback(true) {
+                    @Override
+                    public void handleOnBackPressed() {
+
+                    }
+                });
+
     }
 
     // method to add sa firebase
@@ -148,13 +192,26 @@ public class MainActivity_Students extends AppCompatActivity {
                                             .add(record)
                                             .addOnSuccessListener(doc -> {
 
-                                                new AlertDialog.Builder(this)
-                                                        .setTitle("Attendance Recorded")
-                                                        .setMessage("Status: " + status)
+                                                View view = getLayoutInflater()
+                                                        .inflate(R.layout.attendance_recorded, null);
+
+                                                AlertDialog dialog = new AlertDialog.Builder(this)
+                                                        .setView(view)
                                                         .setCancelable(false)
-                                                        .setPositiveButton("OK",
-                                                                (d, w) -> d.dismiss())
-                                                        .show();
+                                                        .create();
+
+                                                dialog.getWindow().setBackgroundDrawable(
+                                                        new ColorDrawable(Color.TRANSPARENT)
+                                                );
+
+                                                TextView tvMessage = view.findViewById(R.id.tvMessage);
+                                                Button btnOk = view.findViewById(R.id.btnOk);
+
+                                                tvMessage.setText("Status: " + status);
+
+                                                btnOk.setOnClickListener(v -> dialog.dismiss());
+
+                                                dialog.show();
                                             });
 
                                 } catch (ParseException e) {
@@ -176,12 +233,15 @@ public class MainActivity_Students extends AppCompatActivity {
         Button btnCancel = view.findViewById(R.id.btnCancel);
 
         AlertDialog dialog = builder.create();
+        dialog.getWindow().setBackgroundDrawable(
+                new ColorDrawable(Color.TRANSPARENT)
+        );
         dialog.show();
 
         btnCancel.setOnClickListener(v -> dialog.dismiss());
 
         btnJoin.setOnClickListener(v -> {
-            String code = etClassCode.getText().toString().trim().toUpperCase();
+            String code = etClassCode.getText().toString().trim();
             if (code.isEmpty()) {
                 etClassCode.setError("Enter class code");
                 return;

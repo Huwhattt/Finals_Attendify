@@ -44,10 +44,9 @@ public class StudentAdapter extends RecyclerView.Adapter<StudentAdapter.ViewHold
             View view = LayoutInflater.from(v.getContext())
                     .inflate(R.layout.attendclass, null);
 
-            dialog.setContentView(view);
-
-
             dialog.getWindow().setBackgroundDrawableResource(android.R.color.transparent);
+
+            dialog.setContentView(view);
 
             dialog.show();
 
